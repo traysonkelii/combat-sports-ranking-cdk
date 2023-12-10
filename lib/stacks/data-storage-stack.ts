@@ -9,6 +9,8 @@ import { MainTable } from "../constructs/dynamo-db/main-table";
 
 export class DataStorageStack extends cdk.Stack {
   public readonly tableArn: string;
+  public readonly globalIndexes: string[] = [];
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -34,6 +36,8 @@ export class DataStorageStack extends cdk.Stack {
       sortKey: { name: "gsi3sk", type: AttributeType.STRING },
       projectionType: ProjectionType.ALL,
     };
+
+    this.globalIndexes.push(gsi1.indexName, gsi2.indexName, gsi3.indexName);
 
     table.addGlobalSecondaryIndex(gsi1);
     table.addGlobalSecondaryIndex(gsi2);
