@@ -5,7 +5,7 @@ import {
   ProjectionType,
 } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
-import { MainTable } from "../constructs/dynamo-db/main-table";
+import { MainTable } from "../../constructs/dynamo-db/main-table";
 
 export class DataStorageStack extends cdk.Stack {
   public readonly tableArn: string;

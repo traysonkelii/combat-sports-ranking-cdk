@@ -6,8 +6,8 @@ import {
   UserPoolClient,
 } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
-import { PostConfirmationLambda } from "../constructs/lambda/post-confirmation-lambda";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
+import { PostConfirmationLambda } from "../../constructs/lambda/post-confirmation-lambda/post-confirmation-lambda";
 
 export interface AuthorizationStackProps extends StackProps {
   readonly mainTableArn: string;

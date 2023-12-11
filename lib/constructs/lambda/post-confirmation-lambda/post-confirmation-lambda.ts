@@ -2,6 +2,7 @@ import { ITable } from "aws-cdk-lib/aws-dynamodb";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
+import { LambdaBase } from "../shared/lambda-base/lambda-base";
 
 export interface PostConfirmationLambdaProps {
   table: ITable;
@@ -9,7 +10,7 @@ export interface PostConfirmationLambdaProps {
 }
 
 export class PostConfirmationLambda extends Construct {
-  readonly lambdaFunction: lambda.Function;
+  readonly lambdaFunction: lambda.IFunction;
   constructor(
     scope: Construct,
     id: string,
@@ -17,15 +18,12 @@ export class PostConfirmationLambda extends Construct {
   ) {
     super(scope, id);
 
-    this.lambdaFunction = new lambda.Function(this, id + "Implementation", {
-      runtime: lambda.Runtime.NODEJS_18_X,
+    this.lambdaFunction = new LambdaBase(this, id, {
+      table,
+      region,
       handler: "index.postConfirmationHandler",
-      code: lambda.Code.fromAsset("lib/service/src/handlers"),
-      environment: {
-        ["MAIN_TABLE"]: table.tableName,
-        ["REGION"]: region,
-      },
-    });
+      codePath: "resources/src/handlers",
+    }).lambdaFunction;
 
     const putItemMainTablePolicyStatement = new PolicyStatement({
       effect: Effect.ALLOW,
