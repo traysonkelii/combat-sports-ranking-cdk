@@ -26,15 +26,16 @@ export interface PostConfirmationProps {
   response: {};
 }
 
+const table = process.env.MAIN_TABLE || "CombatSportsRanking";
+const region = process.env.REGION || "us-east-1";
+const client = new DynamoDBClient({ region });
+const docClient = DynamoDBDocumentClient.from(client);
+
 export const PostConfirmationHandler = async (event: PostConfirmationProps) => {
   try {
-    const table = process.env.MAIN_TABLE || "CombatSportsRanking";
-    const region = process.env.REGION || "us-east-1";
     const userData = event.request.userAttributes;
     const pk = `USER#${event.request.userAttributes.sub}`;
     const sk = `DATA`;
-    const client = new DynamoDBClient({ region });
-    const docClient = DynamoDBDocumentClient.from(client);
 
     const data = {
       firstName: userData.given_name,
@@ -50,7 +51,7 @@ export const PostConfirmationHandler = async (event: PostConfirmationProps) => {
         sk: sk,
         Data: data,
       },
-      ReturnValues: "NONE",
+      ReturnValues: "ALL_OLD",
     });
 
     await docClient.send(putParams);

@@ -3,10 +3,14 @@ import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { LambdaBase } from "../shared/lambda-base/lambda-base";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { Duration } from "aws-cdk-lib";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
 
 export interface CreateHostLambdaProps {
   table: ITable;
   region: string;
+  layers?: lambda.ILayerVersion[];
 }
 
 export class CreateHostLambda extends Construct {
@@ -14,7 +18,7 @@ export class CreateHostLambda extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { table, region }: CreateHostLambdaProps
+    { table, region, layers }: CreateHostLambdaProps
   ) {
     super(scope, id);
 
@@ -22,7 +26,7 @@ export class CreateHostLambda extends Construct {
       table,
       region,
       handler: "index.createHostHandler",
-      codePath: "resources/src/handlers",
+      codePath: "resources/lambda/src/handlers",
     }).lambdaFunction;
 
     const putItemMainTablePolicyStatement = new PolicyStatement({

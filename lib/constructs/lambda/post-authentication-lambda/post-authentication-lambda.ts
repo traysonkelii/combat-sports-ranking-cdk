@@ -4,32 +4,32 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { LambdaBase } from "../shared/lambda-base/lambda-base";
 
-export interface PostConfirmationLambdaProps {
+export interface PostAuthenticationLambdaProps {
   table: ITable;
   region: string;
   layers?: lambda.ILayerVersion[];
 }
 
-export class PostConfirmationLambda extends Construct {
+export class PostAuthenticationLambda extends Construct {
   readonly lambdaFunction: lambda.IFunction;
   constructor(
     scope: Construct,
     id: string,
-    { table, region, layers }: PostConfirmationLambdaProps
+    { table, region, layers }: PostAuthenticationLambdaProps
   ) {
     super(scope, id);
 
     this.lambdaFunction = new LambdaBase(this, id, {
       table,
       region,
-      handler: "index.postConfirmationHandler",
+      handler: "index.postAuthenticationHandler",
       codePath: "resources/lambda/src/handlers",
       layers,
     }).lambdaFunction;
 
     const putItemMainTablePolicyStatement = new PolicyStatement({
       effect: Effect.ALLOW,
-      actions: ["dynamodb:PutItem"],
+      actions: ["dynamodb:UpdateItem"],
       resources: [table.tableArn],
     });
 

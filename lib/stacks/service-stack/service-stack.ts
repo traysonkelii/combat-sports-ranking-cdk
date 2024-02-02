@@ -5,6 +5,7 @@ import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { CreateHostLambda } from "../../constructs/lambda/create-host-lambda/create-host-lambda";
+import { LayerVersion, Code, Runtime } from "aws-cdk-lib/aws-lambda";
 
 interface ServiceStackPrompts extends cdk.StackProps {
   readonly tableArn: string;
@@ -23,6 +24,42 @@ export class ServiceStack extends cdk.Stack {
       globalIndexes,
     });
 
+    /**
+     * Authorization
+     */
+
+    const authorizer = new CognitoUserPoolsAuthorizer(
+      this,
+      "CognitoAuthorizer",
+      {
+        cognitoUserPools: [userPool],
+      }
+    );
+
+    /**
+     * Lambda Layers
+     */
+
+    const dbClientLambdaLayer = new LayerVersion(this, "LambdaLayer", {
+      code: Code.fromAsset("./resources/layers/db-client"),
+      compatibleRuntimes: [Runtime.NODEJS_18_X],
+      description: "db-client shared layer package",
+    });
+
+    /**
+     * Lambdas
+     */
+
+    const createHostLambda = new CreateHostLambda(this, "CreateHostLambda", {
+      table,
+      region,
+      layers: [dbClientLambdaLayer],
+    }).lambda;
+
+    /**
+     * API Endpoints
+     */
+
     const api = new apigateway.RestApi(this, "CombatSportsRankingApi", {
       restApiName: "CombatSportsRanking",
       defaultCorsPreflightOptions: {
@@ -40,26 +77,6 @@ export class ServiceStack extends cdk.Stack {
       },
     });
 
-    /**
-     * Lambdas
-     */
-
-    const createHostLambda = new CreateHostLambda(this, "CreateHostLambda", {
-      table,
-      region,
-    }).lambda;
-
-    const authorizer = new CognitoUserPoolsAuthorizer(
-      this,
-      "CognitoAuthorizer",
-      {
-        cognitoUserPools: [userPool],
-      }
-    );
-
-    /**
-     * Endpoints
-     */
     const baseApi = api.root.addResource("api");
     const v1 = baseApi.addResource("v1");
     const host = v1.addResource("host");

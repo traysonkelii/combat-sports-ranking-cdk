@@ -6,12 +6,13 @@ export type LambdaBaseProps = Omit<lambda.FunctionProps, "runtime" | "code"> & {
   codePath: string;
   table: ITable;
   region: string;
+  layers?: lambda.ILayerVersion[];
 };
 
 export class LambdaBase {
   readonly lambdaFunction: lambda.Function;
   constructor(scope: Construct, id: string, props: LambdaBaseProps) {
-    const { codePath, handler, table, region } = props;
+    const { codePath, handler, table, region, layers } = props;
 
     this.lambdaFunction = new lambda.Function(scope, id + "Implementation", {
       runtime: lambda.Runtime.NODEJS_18_X,
@@ -21,6 +22,7 @@ export class LambdaBase {
         ["MAIN_TABLE"]: table.tableName,
         ["REGION"]: region,
       },
+      layers,
     });
   }
 }

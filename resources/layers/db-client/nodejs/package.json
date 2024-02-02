@@ -1,0 +1,12 @@
+{
+  "name": "db-client",
+  "version": "0.1.0",
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "~5.2.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.470.0",
+    "@aws-sdk/lib-dynamodb": "^3.470.0"
+  }
+}

@@ -8,6 +8,7 @@ import {
 import { Construct } from "constructs";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { PostConfirmationLambda } from "../../constructs/lambda/post-confirmation-lambda/post-confirmation-lambda";
+import { PostAuthenticationLambda } from "../../constructs/lambda/post-authentication-lambda/post-authentication-lambda";
 
 export interface AuthorizationStackProps extends StackProps {
   readonly mainTableArn: string;
@@ -31,6 +32,12 @@ export class AuthorizationStack extends Stack {
     const postConfirmationLambda = new PostConfirmationLambda(
       this,
       "PostConfirmationLambda",
+      { table, region }
+    );
+
+    const postAuthenticationLambda = new PostAuthenticationLambda(
+      this,
+      "PostAuthenticationLambda",
       { table, region }
     );
 
@@ -70,6 +77,7 @@ export class AuthorizationStack extends Stack {
       accountRecovery: AccountRecovery.EMAIL_ONLY,
       lambdaTriggers: {
         postConfirmation: postConfirmationLambda.lambdaFunction,
+        postAuthentication: postAuthenticationLambda.lambdaFunction,
       },
     });
 
