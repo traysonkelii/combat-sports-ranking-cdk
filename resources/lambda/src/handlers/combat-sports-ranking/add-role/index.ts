@@ -1,26 +1,33 @@
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { Roles } from "resources/lambda/src/shared/constants/roles";
 
 const TableName = process.env.MAIN_TABLE || "CombatSportsRanking";
 const region = process.env.REGION || "us-east-1";
 const client = new DynamoDBClient({ region });
 const docClient = DynamoDBDocumentClient.from(client);
 
-export const CreateHostHandler = async (event: { body: any }) => {
+export interface AddRoleBody {
+  userName: string;
+  role: Roles;
+}
+
+export const AddRoleHandler = async (event: { body: any }) => {
   try {
-    const body = JSON.parse(event.body);
+    const body: AddRoleBody = JSON.parse(event.body);
     const userName = body.userName;
+    const role: Roles = body.role;
     const response = {
       statusCode: 200,
-      body: { message: "success", event },
+      body: { message: `Successfully add the ${role} role to ${userName}` },
     };
 
     const command = new PutItemCommand({
       TableName,
       Item: {
         pk: { S: `USER#${userName}` },
-        sk: { S: `ROLE#HOST` },
-        gsi1pk: { S: `HOST` },
+        sk: { S: `ROLE#${role}` },
+        gsi1pk: { S: `${role}` },
         gsi1sk: { S: `USER#${userName}` },
       },
     });

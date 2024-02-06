@@ -79,7 +79,7 @@ export class ServiceStack extends cdk.Stack {
 
     const baseApi = api.root.addResource("api");
     const v1 = baseApi.addResource("v1");
-    const host = v1.addResource("host");
+    const host = v1.addResource("add-role");
 
     host.addMethod("POST", new apigateway.LambdaIntegration(createHostLambda), {
       authorizer,
