@@ -4,8 +4,8 @@ import { UserPool } from "aws-cdk-lib/aws-cognito";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
-import { CreateHostLambda } from "../../constructs/lambda/create-host-lambda/create-host-lambda";
 import { LayerVersion, Code, Runtime } from "aws-cdk-lib/aws-lambda";
+import { CreateRoleLambda } from "../../constructs/lambda/role/create";
 
 interface ServiceStackPrompts extends cdk.StackProps {
   readonly tableArn: string;
@@ -50,7 +50,7 @@ export class ServiceStack extends cdk.Stack {
      * Lambdas
      */
 
-    const createHostLambda = new CreateHostLambda(this, "CreateHostLambda", {
+    const createRoleLambda = new CreateRoleLambda(this, "CreateRoleLambda", {
       table,
       region,
       layers: [dbClientLambdaLayer],
@@ -79,11 +79,25 @@ export class ServiceStack extends cdk.Stack {
 
     const baseApi = api.root.addResource("api");
     const v1 = baseApi.addResource("v1");
-    const host = v1.addResource("add-role");
+    const role = v1.addResource("add-role");
+    const tournament = v1.addResource("tournament");
 
-    host.addMethod("POST", new apigateway.LambdaIntegration(createHostLambda), {
+    /**
+     * Role creation endpoints
+     */
+
+    role.addMethod("POST", new apigateway.LambdaIntegration(createRoleLambda), {
       authorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
+
+    /**
+     * Tournament endpoints
+     */
+
+    // tournament.addMethod("GET", new apigateway.LambdaIntegration(), {
+    //   authorizer,
+    //   authorizationType: apigateway.AuthorizationType.COGNITO,
+    // });
   }
 }

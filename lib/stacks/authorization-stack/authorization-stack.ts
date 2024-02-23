@@ -7,8 +7,8 @@ import {
 } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
-import { PostConfirmationLambda } from "../../constructs/lambda/post-confirmation-lambda/post-confirmation-lambda";
-import { PostAuthenticationLambda } from "../../constructs/lambda/post-authentication-lambda/post-authentication-lambda";
+import { PostConfirmationLambda } from "../../constructs/lambda/cognito/post-confirmation-lambda";
+import { PostAuthenticationLambda } from "../../constructs/lambda/cognito/post-authentication-lambda";
 
 export interface AuthorizationStackProps extends StackProps {
   readonly mainTableArn: string;

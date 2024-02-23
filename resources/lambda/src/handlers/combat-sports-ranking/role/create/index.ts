@@ -12,7 +12,7 @@ export interface AddRoleBody {
   role: Roles;
 }
 
-export const AddRoleHandler = async (event: { body: any }) => {
+export const CreateRoleHandler = async (event: { body: any }) => {
   try {
     const body: AddRoleBody = JSON.parse(event.body);
     const userName = body.userName;
@@ -47,6 +47,6 @@ export const AddRoleHandler = async (event: { body: any }) => {
       },
     };
   } catch (error) {
-    throw new Error("Error in host creation: " + error);
+    throw new Error("Error in role creation: " + error);
   }
 };
