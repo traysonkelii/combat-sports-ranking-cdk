@@ -1,0 +1,16 @@
+export type Roles = "FIGHTER" | "HOST" | "COACH" | "JUDGE";
+export const KEY_TOURNAMENT = "TOURNAMENT";
+export const KEY_HOST = "HOST";
+export const KEY_DATA = "DATA";
+export const KEY_GYM = "GYM";
+export const KEY_USER = "USER";
+export const KEY_ROLE = "ROLE";
+export const GSI1_INDEX = "GSI-1";
+export const GSI2_INDEX = "GSI-2";
+export const GSI3_INDEX = "GSI-3";
+export const GSI1_PK = "gsi1pk";
+export const GSI1_SK = "gsi1sk";
+export const GSI2_PK = "gsi2pk";
+export const GSI2_SK = "gsi2sk";
+export const GSI3_PK = "gsi3pk";
+export const GSI3_SK = "gsi3sk";

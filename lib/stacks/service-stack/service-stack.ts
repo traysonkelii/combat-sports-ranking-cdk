@@ -6,6 +6,9 @@ import { Construct } from "constructs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { LayerVersion, Code, Runtime } from "aws-cdk-lib/aws-lambda";
 import { CreateRoleLambda } from "../../constructs/lambda/role/create";
+import { CreateTournamentLambda } from "../../constructs/lambda/tournament/create";
+import { CreateGymLambda } from "../../constructs/lambda/gym/create";
+import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
 
 interface ServiceStackPrompts extends cdk.StackProps {
   readonly tableArn: string;
@@ -56,6 +59,26 @@ export class ServiceStack extends cdk.Stack {
       layers: [dbClientLambdaLayer],
     }).lambda;
 
+    const getUsersByRoleLambda = new GetUsersByRoleLambda(
+      this,
+      "GetUsersByRoleLambda",
+      {
+        table,
+        region,
+      }
+    ).lambda;
+
+    const createTournamentLambda = new CreateTournamentLambda(
+      this,
+      "CreateTournamentLambda",
+      { table, region }
+    ).lambda;
+
+    const createGymLambda = new CreateGymLambda(this, "CreateGymLambda", {
+      table,
+      region,
+    }).lambda;
+
     /**
      * API Endpoints
      */
@@ -79,25 +102,47 @@ export class ServiceStack extends cdk.Stack {
 
     const baseApi = api.root.addResource("api");
     const v1 = baseApi.addResource("v1");
-    const role = v1.addResource("add-role");
+    const addRole = v1.addResource("add-role");
+    const getUsersByRole = v1.addResource("get-by-role");
     const tournament = v1.addResource("tournament");
+    const gym = v1.addResource("gym");
 
     /**
      * Role creation endpoints
      */
 
-    role.addMethod("POST", new apigateway.LambdaIntegration(createRoleLambda), {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
+    addRole.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(createRoleLambda),
+      { authorizer, authorizationType: apigateway.AuthorizationType.COGNITO }
+    );
+
+    getUsersByRole.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(getUsersByRoleLambda),
+      { authorizer, authorizationType: apigateway.AuthorizationType.COGNITO }
+    );
 
     /**
      * Tournament endpoints
      */
 
-    // tournament.addMethod("GET", new apigateway.LambdaIntegration(), {
-    //   authorizer,
-    //   authorizationType: apigateway.AuthorizationType.COGNITO,
-    // });
+    tournament.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(createTournamentLambda),
+      {
+        authorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      }
+    );
+
+    /**
+     * Gym endpoints
+     */
+
+    gym.addMethod("POST", new apigateway.LambdaIntegration(createGymLambda), {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
   }
 }
