@@ -1,41 +1,49 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { KEY_ROLE, KEY_USER, Roles } from "../../../shared/constants";
+
 import { headers } from "../../../shared/headers/headers";
+import { randomUUID } from "crypto";
+import { KEY_DATA, KEY_GYM } from "../../../shared/constants";
 
 const TableName = process.env.MAIN_TABLE || "CombatSportsRanking";
 const region = process.env.REGION || "us-east-1";
 const client = new DynamoDBClient({ region });
 const docClient = DynamoDBDocumentClient.from(client);
 
-export interface AddRoleBody {
-  userName: string;
-  role: Roles;
-  firstName: string;
-  lastName: string;
+export interface AddGymBody {
+  ownerIds: string[];
+  coachIds: string[];
+  gymName: string;
+  gymLocations: string[];
 }
 
-export const CreateRoleHandler = async (event: { body: any }) => {
+export const CreateGymHandler = async (event: { body: any }) => {
   try {
-    const { userName, role, firstName, lastName }: AddRoleBody = JSON.parse(
-      event.body
-    );
+    const { ownerIds, coachIds, gymName, gymLocations }: AddGymBody =
+      JSON.parse(event.body);
     const response = {
       statusCode: 200,
-      body: { message: `Successfully add the ${role} role to ${userName}` },
+      body: {
+        message: `Successfully created gym ${gymName}`,
+      },
+    };
+
+    const gymId = randomUUID();
+    const pk = `${KEY_GYM}#${gymId}`;
+    const sk = KEY_DATA;
+    const data = {
+      gymName,
+      ownerIds,
+      coachIds,
+      gymLocations,
     };
 
     const command = new PutCommand({
       TableName,
       Item: {
-        pk: `${KEY_USER}#${userName}`,
-        sk: `${KEY_ROLE}#${role}`,
-        gsi1pk: `${role}`,
-        gsi1sk: `${role}#${userName}`,
-        data: {
-          firstName,
-          lastName,
-        },
+        pk,
+        sk,
+        data,
       },
     });
     await docClient.send(command);
@@ -46,6 +54,6 @@ export const CreateRoleHandler = async (event: { body: any }) => {
       headers,
     };
   } catch (error) {
-    throw new Error("Error in role creation: " + error);
+    throw new Error("Error in gym creation: " + error);
   }
 };

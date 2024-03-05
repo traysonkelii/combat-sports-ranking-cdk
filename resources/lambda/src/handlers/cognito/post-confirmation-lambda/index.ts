@@ -49,7 +49,7 @@ export const PostConfirmationHandler = async (event: PostConfirmationProps) => {
       Item: {
         pk: pk,
         sk: sk,
-        Data: data,
+        data,
       },
       ReturnValues: "ALL_OLD",
     });
