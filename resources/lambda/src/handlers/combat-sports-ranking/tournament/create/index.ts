@@ -1,61 +1,80 @@
-import {
-  DynamoDBClient,
-  TransactWriteItemsCommand,
-} from "@aws-sdk/client-dynamodb";
-import { randomUUID } from "crypto";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { KEY_DATA, KEY_HOST, KEY_TOURNAMENT } from "../../../shared/constants";
 import { headers } from "../../../shared/headers/headers";
+import {
+  DynamoDBDocumentClient,
+  TransactWriteCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 const TableName = process.env.MAIN_TABLE || "CombatSportsRanking";
 const region = process.env.REGION || "us-east-1";
 const client = new DynamoDBClient({ region });
+const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 export interface AddTournamentBody {
-  userName: string;
+  host: string;
+  tournamentName: string;
+  dateStart?: string;
+  dateEnd?: string;
+  location?: string;
 }
 
 export const CreateTournamentHandler = async (event: { body: any }) => {
   try {
     const body: AddTournamentBody = JSON.parse(event.body);
-    const userName = body.userName;
+    const userName = body.host;
+    const data = {
+      dateStart: body.dateStart ?? "",
+      dateEnd: body.dateEnd ?? "",
+      location: body.location ?? "",
+      tournamentName: body.tournamentName,
+    };
+
+    console.log("body: ", data);
+
     const response = {
       statusCode: 200,
       body: {
         message: `Successfully created the tournament role for ${userName}`,
       },
     };
-    const tournamentID = randomUUID();
+
+    const tournamentID = body.tournamentName;
     const params = {
       TransactItems: [
         {
           Put: {
             TableName,
             Item: {
-              pk: { S: `${KEY_TOURNAMENT}#${tournamentID}` },
-              sk: { S: `${KEY_TOURNAMENT}#${tournamentID}` }, // Using sort key
-              gsi1pk: { S: `${KEY_HOST}#${userName}` },
-              gsi1sk: { S: `${KEY_HOST}#${userName}` },
-              createdAt: { S: new Date().toISOString() }, // Example of adding a timestamp
+              pk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              sk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              gsi1pk: `${KEY_HOST}#${userName}`,
+              gsi1sk: `${KEY_HOST}#${userName}`,
+              createdAt: new Date().getTime(),
             },
+            ConditionExpression: "attribute_not_exists(pk)",
           },
         },
         {
           Put: {
             TableName,
             Item: {
-              pk: { S: `${KEY_TOURNAMENT}#${tournamentID}` },
-              sk: { S: `${KEY_DATA}` }, // Using sort key
-              gsi1pk: { S: `${KEY_TOURNAMENT}` },
-              gsi1sk: { S: `${KEY_TOURNAMENT}#${tournamentID}` },
-              createdAt: { S: new Date().toISOString() }, // Example of adding a timestamp
+              pk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              sk: `${KEY_DATA}`,
+              gsi1pk: `${KEY_TOURNAMENT}`,
+              gsi1sk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              createdAt: new Date().getTime(),
+              data: data,
             },
+            ConditionExpression: "attribute_not_exists(pk)",
           },
         },
       ],
     };
 
-    const command = new TransactWriteItemsCommand(params);
-    await client.send(command);
+    const results = await ddbDocClient.send(new TransactWriteCommand(params));
+
+    console.log(results);
 
     return {
       statusCode: 200,
@@ -63,7 +82,24 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
       isBase64Encoded: false,
       headers,
     };
-  } catch (error) {
-    throw new Error("Error in tournament creation: " + error);
+  } catch (error: any) {
+    console.error("Error in creating tournament:", error);
+    // Here, ensure the error is serialized properly
+    const message =
+      typeof error === "string" ? error : error.message || "Unknown error";
+
+    const isConditionalCheckFailed = /ConditionalCheckFailed/.test(message);
+
+    const errorMessage = isConditionalCheckFailed
+      ? "Tournament with that name already exists."
+      : `Error in creating tournament: ${error.message || "Unknown error"}`;
+
+    return {
+      statusCode: isConditionalCheckFailed ? 409 : 500,
+      body: JSON.stringify({
+        error: `Error in creating tournament: ${errorMessage}`,
+      }),
+      headers,
+    };
   }
 };
