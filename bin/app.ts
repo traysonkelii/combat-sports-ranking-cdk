@@ -5,6 +5,7 @@ import { baseConfig } from "../lib/config/configuration";
 import { AuthorizationStack } from "../lib/stacks/authorization-stack/authorization-stack";
 import { DataStorageStack } from "../lib/stacks/data-storage-stack/data-storage-stack";
 import { ServiceStack } from "../lib/stacks/service-stack/service-stack";
+import { PipelineStack } from "../lib/stacks/code-pipeline-stack/code-pipeline-stack";
 
 const app = new cdk.App();
 const dataStorageStack = new DataStorageStack(app, "DataStorageStack");
@@ -21,3 +22,5 @@ const serviceStack = new ServiceStack(app, "CsrServiceStack", {
   region: baseConfig.region,
   userPool: authorizationStack.userPool,
 });
+
+const pipelineStack = new PipelineStack(app, "PipelineStack");
