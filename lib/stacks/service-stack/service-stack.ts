@@ -9,6 +9,7 @@ import { CreateRoleLambda } from "../../constructs/lambda/role/create";
 import { CreateTournamentLambda } from "../../constructs/lambda/tournament/create";
 import { CreateGymLambda } from "../../constructs/lambda/gym/create";
 import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
+import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read";
 
 interface ServiceStackPrompts extends cdk.StackProps {
   readonly tableArn: string;
@@ -74,6 +75,12 @@ export class ServiceStack extends cdk.Stack {
       { table, region }
     ).lambda;
 
+    const getTournamentsLambda = new GetTournamentsLambda(
+      this,
+      "GetTournamentsLambda",
+      { table, region }
+    ).lambda;
+
     const createGymLambda = new CreateGymLambda(this, "CreateGymLambda", {
       table,
       region,
@@ -102,9 +109,16 @@ export class ServiceStack extends cdk.Stack {
 
     const baseApi = api.root.addResource("api");
     const v1 = baseApi.addResource("v1");
+
+    // user api
     const addRole = v1.addResource("add-role");
     const getUsersByRole = v1.addResource("get-by-role");
+
+    // tournament api
     const tournament = v1.addResource("tournament");
+    const getTournamentsByStatus = v1.addResource("get-by-status");
+
+    // gym api
     const gym = v1.addResource("gym");
 
     /**
@@ -134,6 +148,11 @@ export class ServiceStack extends cdk.Stack {
         authorizer,
         authorizationType: apigateway.AuthorizationType.COGNITO,
       }
+    );
+
+    getTournamentsByStatus.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(getTournamentsLambda)
     );
 
     /**

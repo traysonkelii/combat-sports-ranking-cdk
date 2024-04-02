@@ -1,4 +1,5 @@
 export type Roles = "FIGHTER" | "HOST" | "COACH" | "JUDGE";
+export type TournamentPartitionKey = "LIVE" | "DONE" | "ALL";
 export const KEY_TOURNAMENT = "TOURNAMENT";
 export const KEY_HOST = "HOST";
 export const KEY_DATA = "DATA";
