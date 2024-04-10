@@ -71,5 +71,45 @@ export class PipelineStack extends Stack {
         }),
       ],
     });
+
+    pipeline.addStage({
+      stageName: "Authorization_Update",
+      actions: [
+        new CloudFormationCreateUpdateStackAction({
+          actionName: "Authorization_Update",
+          stackName: "AuthorizationStack",
+          templatePath: codeBuildOutput.atPath(
+            "AuthorizationStack.template.json"
+          ),
+          adminPermissions: true,
+        }),
+      ],
+    });
+
+    pipeline.addStage({
+      stageName: "CsrService_Update",
+      actions: [
+        new CloudFormationCreateUpdateStackAction({
+          actionName: "CsrService_Update",
+          stackName: "CsrServiceStack",
+          templatePath: codeBuildOutput.atPath("CsrServiceStack.template.json"),
+          adminPermissions: true,
+        }),
+      ],
+    });
+
+    pipeline.addStage({
+      stageName: "DataStorage_Update",
+      actions: [
+        new CloudFormationCreateUpdateStackAction({
+          actionName: "DataStorage_Update",
+          stackName: "DataStorageStack",
+          templatePath: codeBuildOutput.atPath(
+            "DataStorageStack.template.json"
+          ),
+          adminPermissions: true,
+        }),
+      ],
+    });
   }
 }
