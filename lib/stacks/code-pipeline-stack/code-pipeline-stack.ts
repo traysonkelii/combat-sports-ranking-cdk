@@ -82,6 +82,10 @@ export class PipelineStack extends Stack {
             "AuthorizationStack.template.json"
           ),
           adminPermissions: true,
+          parameterOverrides: {
+            s3LambdaCodeBucketName: codeBuildOutput.bucketName,
+            s3LambdaCodeBucketKey: codeBuildOutput.objectKey,
+          },
         }),
       ],
     });
