@@ -10,6 +10,7 @@ import { CreateTournamentLambda } from "../../constructs/lambda/tournament/creat
 import { CreateGymLambda } from "../../constructs/lambda/gym/create";
 import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
 import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read";
+import { GetGymLambda } from "lib/constructs/lambda/gym/read";
 
 interface ServiceStackPrompts extends cdk.StackProps {
   readonly tableArn: string;
@@ -86,6 +87,11 @@ export class ServiceStack extends cdk.Stack {
       region,
     }).lambda;
 
+    const getGymLambda = new GetGymLambda(this, "GetGym", {
+      table,
+      region,
+    }).lambda;
+
     /**
      * API Endpoints
      */
@@ -120,6 +126,7 @@ export class ServiceStack extends cdk.Stack {
 
     // gym api
     const gym = v1.addResource("gym");
+    const getGym = v1.addResource("get-gym");
 
     /**
      * Role creation endpoints
@@ -160,6 +167,11 @@ export class ServiceStack extends cdk.Stack {
      */
 
     gym.addMethod("POST", new apigateway.LambdaIntegration(createGymLambda), {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    getGym.addMethod("POST", new apigateway.LambdaIntegration(getGymLambda), {
       authorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
