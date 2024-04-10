@@ -83,8 +83,8 @@ export class PipelineStack extends Stack {
           ),
           adminPermissions: true,
           parameterOverrides: {
-            s3LambdaCodeBucketName: codeBuildOutput.bucketName,
-            s3LambdaCodeBucketKey: codeBuildOutput.objectKey,
+            S3Bucket: codeBuildOutput.bucketName,
+            S3Key: codeBuildOutput.objectKey,
           },
         }),
       ],
