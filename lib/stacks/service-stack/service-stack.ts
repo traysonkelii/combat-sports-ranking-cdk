@@ -10,7 +10,7 @@ import { CreateTournamentLambda } from "../../constructs/lambda/tournament/creat
 import { CreateGymLambda } from "../../constructs/lambda/gym/create";
 import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
 import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read";
-import { GetGymLambda } from "lib/constructs/lambda/gym/read";
+import { GetGymLambda } from "../../constructs/lambda/gym/read";
 
 interface ServiceStackPrompts extends cdk.StackProps {
   readonly tableArn: string;
