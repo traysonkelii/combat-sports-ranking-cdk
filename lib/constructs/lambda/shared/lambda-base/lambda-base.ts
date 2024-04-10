@@ -1,4 +1,5 @@
 import { ITable } from "aws-cdk-lib/aws-dynamodb";
+import { ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 
@@ -24,5 +25,9 @@ export class LambdaBase {
       },
       layers,
     });
+
+    this.lambdaFunction.grantInvoke(
+      new ServicePrincipal("codepipeline.amazonaws.com")
+    );
   }
 }
