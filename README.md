@@ -1,4 +1,4 @@
-# Welcome to Combat Sports Ranking
+# Welcome to Combat Sports Ranking CDK
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
