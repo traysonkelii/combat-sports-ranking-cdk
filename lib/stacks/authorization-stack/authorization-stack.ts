@@ -1,4 +1,4 @@
-import { Stack, StackProps } from "aws-cdk-lib";
+import { Stack } from "aws-cdk-lib";
 import {
   UserPool,
   VerificationEmailStyle,
@@ -9,11 +9,11 @@ import { Construct } from "constructs";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { PostConfirmationLambda } from "../../constructs/lambda/cognito/post-confirmation-lambda";
 import { PostAuthenticationLambda } from "../../constructs/lambda/cognito/post-authentication-lambda";
+import { EnvironmentConfig, projectName } from "lib/config/configuration";
 
-export interface AuthorizationStackProps extends StackProps {
+export interface AuthorizationStackProps extends EnvironmentConfig {
   readonly mainTableArn: string;
   readonly globalIndexes: string[];
-  readonly region: string;
 }
 
 export class AuthorizationStack extends Stack {
@@ -22,9 +22,14 @@ export class AuthorizationStack extends Stack {
 
   constructor(scope: Construct, id: string, props: AuthorizationStackProps) {
     super(scope, id, props);
-    const { mainTableArn, globalIndexes, region } = props;
+    const {
+      mainTableArn,
+      globalIndexes,
+      env: { region },
+      stageName,
+    } = props;
 
-    const table = Table.fromTableAttributes(this, "mainTableArnAuthStack", {
+    const table = Table.fromTableAttributes(this, `mainTableArnAuthStack`, {
       tableArn: mainTableArn,
       globalIndexes: globalIndexes,
     });
@@ -41,49 +46,53 @@ export class AuthorizationStack extends Stack {
       { table, region }
     );
 
-    this.userPool = new UserPool(this, "CombatSportsRankingCognitoPool", {
-      selfSignUpEnabled: true,
-      userVerification: {
-        emailStyle: VerificationEmailStyle.CODE,
-      },
-      signInAliases: {
-        email: true,
-      },
-      standardAttributes: {
-        email: {
-          required: true,
-          mutable: true,
+    this.userPool = new UserPool(
+      this,
+      `${projectName}-${stageName}-CognitoPool`,
+      {
+        selfSignUpEnabled: true,
+        userVerification: {
+          emailStyle: VerificationEmailStyle.CODE,
         },
-        birthdate: {
-          required: true,
-          mutable: false,
+        signInAliases: {
+          email: true,
         },
-        givenName: {
-          required: true,
-          mutable: true,
+        standardAttributes: {
+          email: {
+            required: true,
+            mutable: true,
+          },
+          birthdate: {
+            required: true,
+            mutable: false,
+          },
+          givenName: {
+            required: true,
+            mutable: true,
+          },
+          familyName: {
+            required: true,
+            mutable: true,
+          },
         },
-        familyName: {
-          required: true,
-          mutable: true,
+        passwordPolicy: {
+          minLength: 8,
+          requireLowercase: true,
+          requireUppercase: true,
+          requireDigits: true,
+          requireSymbols: true,
         },
-      },
-      passwordPolicy: {
-        minLength: 8,
-        requireLowercase: true,
-        requireUppercase: true,
-        requireDigits: true,
-        requireSymbols: true,
-      },
-      accountRecovery: AccountRecovery.EMAIL_ONLY,
-      lambdaTriggers: {
-        postConfirmation: postConfirmationLambda.lambdaFunction,
-        postAuthentication: postAuthenticationLambda.lambdaFunction,
-      },
-    });
+        accountRecovery: AccountRecovery.EMAIL_ONLY,
+        lambdaTriggers: {
+          postConfirmation: postConfirmationLambda.lambdaFunction,
+          postAuthentication: postAuthenticationLambda.lambdaFunction,
+        },
+      }
+    );
 
     this.userPoolClient = new UserPoolClient(
       this,
-      "CombatSportsRankingCognitoWebClient",
+      `${projectName}-${stageName}-CognitoWebClient`,
       {
         userPool: this.userPool,
         authFlows: {

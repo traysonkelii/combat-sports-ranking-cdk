@@ -11,10 +11,20 @@ import {
   GitHubSourceAction,
 } from "aws-cdk-lib/aws-codepipeline-actions";
 import { Construct } from "constructs";
+import { EnvironmentConfig } from "lib/config/configuration";
 
 export class PipelineStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: StackProps & EnvironmentConfig
+  ) {
     super(scope, id, props);
+
+    const {
+      stageName,
+      env: { region },
+    } = props;
 
     const pipeline = new Pipeline(this, "Pipeline", {
       pipelineName: "CombatSportsRankingPipeline",

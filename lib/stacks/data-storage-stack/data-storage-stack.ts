@@ -6,20 +6,21 @@ import {
 } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import { MainTable } from "../../constructs/dynamo-db/main-table";
-import { EnvironmentConfig } from "../../config/configuration";
+import { EnvironmentConfig, projectName } from "../../config/configuration";
+
+export interface DataStorageStackProps extends EnvironmentConfig {}
 
 export class DataStorageStack extends cdk.Stack {
   public readonly tableArn: string;
   public readonly globalIndexes: string[] = [];
 
-  constructor(
-    scope: Construct,
-    id: string,
-    props?: cdk.StackProps & EnvironmentConfig
-  ) {
+  constructor(scope: Construct, id: string, props: DataStorageStackProps) {
     super(scope, id, props);
+    const { stageName } = props;
 
-    const table = new MainTable(this, "CombatSportsRankingMainTable").table;
+    const table = new MainTable(this, `${projectName}-${stageName}-MainTable`, {
+      tableName: `${projectName}-${stageName}-MainTable`,
+    }).table;
 
     const gsi1: GlobalSecondaryIndexProps = {
       indexName: "GSI-1",

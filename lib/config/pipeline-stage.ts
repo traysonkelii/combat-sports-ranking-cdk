@@ -8,23 +8,21 @@ import { ServiceStack } from "../stacks/service-stack/service-stack";
 export class PipelineStage extends cdk.Stage {
   constructor(scope: Construct, id: string, props: EnvironmentConfig) {
     super(scope, id, props);
-    const {
-      stageName,
-      env: { region },
-    } = props;
+    const { stageName } = props;
 
     const dataStorageStack = new DataStorageStack(
       this,
-      `${projectName}-${stageName}-DataStorageStack`
+      `${projectName}-${stageName}-DataStorageStack`,
+      { ...props }
     );
 
     const authorizationStack = new AuthorizationStack(
       this,
       `${projectName}-${stageName}-AuthorizationStack`,
       {
+        ...props,
         mainTableArn: dataStorageStack.tableArn,
         globalIndexes: dataStorageStack.globalIndexes,
-        region,
       }
     );
 
@@ -32,9 +30,9 @@ export class PipelineStage extends cdk.Stage {
       this,
       `${projectName}-${stageName}-ServiceStack`,
       {
+        ...props,
         tableArn: dataStorageStack.tableArn,
         globalIndexes: dataStorageStack.globalIndexes,
-        region,
         userPool: authorizationStack.userPool,
       }
     );
