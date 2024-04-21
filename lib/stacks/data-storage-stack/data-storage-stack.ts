@@ -6,12 +6,17 @@ import {
 } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import { MainTable } from "../../constructs/dynamo-db/main-table";
+import { EnvironmentConfig } from "../../config/configuration";
 
 export class DataStorageStack extends cdk.Stack {
   public readonly tableArn: string;
   public readonly globalIndexes: string[] = [];
 
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props?: cdk.StackProps & EnvironmentConfig
+  ) {
     super(scope, id, props);
 
     const table = new MainTable(this, "CombatSportsRankingMainTable").table;
