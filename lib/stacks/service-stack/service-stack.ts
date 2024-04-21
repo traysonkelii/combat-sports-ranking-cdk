@@ -50,18 +50,14 @@ export class ServiceStack extends cdk.Stack {
      * Lambdas
      */
 
-    const createRoleLambda = new CreateRoleLambda(
-      this,
-      `${projectName}-${stageName}-CreateRoleLambda`,
-      {
-        table,
-        region,
-      }
-    ).lambda;
+    const createRoleLambda = new CreateRoleLambda(this, `CreateRoleLambda`, {
+      table,
+      region,
+    }).lambda;
 
     const getUsersByRoleLambda = new GetUsersByRoleLambda(
       this,
-      `${projectName}-${stageName}-GetUsersByRoleLambda`,
+      `GetUsersByRoleLambda`,
       {
         table,
         region,
@@ -70,58 +66,46 @@ export class ServiceStack extends cdk.Stack {
 
     const createTournamentLambda = new CreateTournamentLambda(
       this,
-      `${projectName}-${stageName}-CreateTournamentLambda`,
+      `CreateTournamentLambda`,
       { table, region }
     ).lambda;
 
     const getTournamentsLambda = new GetTournamentsLambda(
       this,
-      `${projectName}-${stageName}-GetTournamentsLambda`,
+      `GetTournamentsLambda`,
       { table, region }
     ).lambda;
 
-    const createGymLambda = new CreateGymLambda(
-      this,
-      `${projectName}-${stageName}-CreateGymLambda`,
-      {
-        table,
-        region,
-      }
-    ).lambda;
+    const createGymLambda = new CreateGymLambda(this, `CreateGymLambda`, {
+      table,
+      region,
+    }).lambda;
 
-    const getGymLambda = new GetGymLambda(
-      this,
-      `${projectName}-${stageName}-GetGym`,
-      {
-        table,
-        region,
-      }
-    ).lambda;
+    const getGymLambda = new GetGymLambda(this, `GetGym`, {
+      table,
+      region,
+    }).lambda;
 
     /**
      * API Endpoints
      */
 
-    const api = new apigateway.RestApi(
-      this,
-      `${projectName}-${stageName}-CombatSportsRankingApi`,
-      {
-        restApiName: `CombatSportsRanking-${stageName}`,
-        defaultCorsPreflightOptions: {
-          allowOrigins: apigateway.Cors.ALL_ORIGINS,
-          allowMethods: apigateway.Cors.ALL_METHODS,
-          allowHeaders: [
-            "Content-Type",
-            "Authorization",
-            "X-Amz-Date",
-            "X-Api-Key",
-            "X-Amz-Security-Token",
-            "X-Amz-User-Agent",
-          ],
-          allowCredentials: true,
-        },
-      }
-    );
+    const api = new apigateway.RestApi(this, `CombatSportsRankingApi`, {
+      restApiName: `CombatSportsRanking-${stageName}`,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: [
+          "Content-Type",
+          "Authorization",
+          "X-Amz-Date",
+          "X-Api-Key",
+          "X-Amz-Security-Token",
+          "X-Amz-User-Agent",
+        ],
+        allowCredentials: true,
+      },
+    });
 
     const baseApi = api.root.addResource("api");
     const v1 = baseApi.addResource("v1");
