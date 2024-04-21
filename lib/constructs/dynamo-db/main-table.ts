@@ -13,7 +13,7 @@ export class MainTable extends Construct {
 
     const { tableName } = props;
 
-    this.table = new Table(scope, `${tableName}`, {
+    this.table = new Table(scope, `${tableName}-impl`, {
       partitionKey: { name: "pk", type: AttributeType.STRING },
       sortKey: { name: "sk", type: AttributeType.STRING },
       tableName: `${tableName}`,
