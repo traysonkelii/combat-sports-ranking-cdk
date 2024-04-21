@@ -26,15 +26,11 @@ export class PipelineStage extends cdk.Stage {
       }
     );
 
-    const serviceStack = new ServiceStack(
-      this,
-      `${projectName}-${stageName}-ServiceStack`,
-      {
-        ...props,
-        tableArn: dataStorageStack.tableArn,
-        globalIndexes: dataStorageStack.globalIndexes,
-        userPool: authorizationStack.userPool,
-      }
-    );
+    new ServiceStack(this, `${projectName}-${stageName}-ServiceStack`, {
+      ...props,
+      tableArn: dataStorageStack.tableArn,
+      globalIndexes: dataStorageStack.globalIndexes,
+      userPool: authorizationStack.userPool,
+    });
   }
 }
