@@ -11,7 +11,7 @@ import {
   GitHubSourceAction,
 } from "aws-cdk-lib/aws-codepipeline-actions";
 import { Construct } from "constructs";
-import { EnvironmentConfig } from "lib/config/configuration";
+import { EnvironmentConfig } from "../../config/configuration";
 
 export class PipelineStack extends Stack {
   constructor(

@@ -10,7 +10,7 @@ import { CreateGymLambda } from "../../constructs/lambda/gym/create";
 import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
 import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read";
 import { GetGymLambda } from "../../constructs/lambda/gym/read";
-import { EnvironmentConfig, projectName } from "lib/config/configuration";
+import { EnvironmentConfig, projectName } from "../../config/configuration";
 
 interface ServiceStackPrompts extends EnvironmentConfig {
   readonly tableArn: string;

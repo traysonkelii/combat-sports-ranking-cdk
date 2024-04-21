@@ -9,7 +9,7 @@ import { Construct } from "constructs";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { PostConfirmationLambda } from "../../constructs/lambda/cognito/post-confirmation-lambda";
 import { PostAuthenticationLambda } from "../../constructs/lambda/cognito/post-authentication-lambda";
-import { EnvironmentConfig, projectName } from "lib/config/configuration";
+import { EnvironmentConfig, projectName } from "../../config/configuration";
 
 export interface AuthorizationStackProps extends EnvironmentConfig {
   readonly mainTableArn: string;
