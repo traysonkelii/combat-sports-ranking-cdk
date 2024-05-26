@@ -1,4 +1,9 @@
-import { AttributeType, StreamViewType, Table } from "aws-cdk-lib/aws-dynamodb";
+import {
+  AttributeType,
+  BillingMode,
+  StreamViewType,
+  Table,
+} from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 
 export interface MainTableProps {
@@ -19,6 +24,7 @@ export class MainTable extends Construct {
       tableName: `${tableName}`,
       timeToLiveAttribute: "ExpiryDate",
       stream: StreamViewType.NEW_AND_OLD_IMAGES,
+      billingMode: BillingMode.PAY_PER_REQUEST,
     });
   }
 }
