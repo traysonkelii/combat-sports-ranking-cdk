@@ -23,11 +23,13 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
   try {
     const body: AddTournamentBody = JSON.parse(event.body);
     const userName = body.host;
+    const tournamentId = body.tournamentName.trim().replace(/\s+/g, "_");
+
     const data = {
       dateStart: body.dateStart ?? "",
       dateEnd: body.dateEnd ?? "",
       location: body.location ?? "",
-      tournamentName: body.tournamentName,
+      tournamentName: tournamentId,
     };
 
     console.log("body: ", data);
@@ -39,15 +41,14 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
       },
     };
 
-    const tournamentID = body.tournamentName.trim().replace(/\s+/g, "_");
     const params = {
       TransactItems: [
         {
           Put: {
             TableName,
             Item: {
-              pk: `${KEY_TOURNAMENT}#${tournamentID}`,
-              sk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              pk: `${KEY_TOURNAMENT}#${tournamentId}`,
+              sk: `${KEY_TOURNAMENT}#${tournamentId}`,
               gsi1pk: `${KEY_HOST}#${userName}`,
               gsi1sk: `${KEY_HOST}#${userName}`,
               createdAt: new Date().getTime(),
@@ -59,10 +60,10 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
           Put: {
             TableName,
             Item: {
-              pk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              pk: `${KEY_TOURNAMENT}#${tournamentId}`,
               sk: `${KEY_DATA}`,
               gsi1pk: `${KEY_TOURNAMENT}`,
-              gsi1sk: `${KEY_TOURNAMENT}#${tournamentID}`,
+              gsi1sk: `${KEY_TOURNAMENT}#${tournamentId}`,
               createdAt: new Date().getTime(),
               data: data,
             },
