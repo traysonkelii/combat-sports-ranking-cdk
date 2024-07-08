@@ -11,7 +11,7 @@ import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
 import { GetGymLambda } from "../../constructs/lambda/gym/read";
 import { EnvironmentConfig, projectName } from "../../config/configuration";
 import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read/get-tournaments";
-import { GetTournamentHostLambda } from "lib/constructs/lambda/tournament/read/get-tournament-host";
+import { GetTournamentHostLambda } from "../../constructs/lambda/tournament/read/get-tournament-host";
 
 interface ServiceStackPrompts extends EnvironmentConfig {
   readonly tableArn: string;
