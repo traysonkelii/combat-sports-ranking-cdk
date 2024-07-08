@@ -27,7 +27,7 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
       dateStart: body.dateStart ?? "",
       dateEnd: body.dateEnd ?? "",
       location: body.location ?? "",
-      tournamentName: body.tournamentName.trim().replace(/\s+/g, "_"),
+      tournamentName: body.tournamentName,
     };
 
     console.log("body: ", data);
@@ -39,7 +39,7 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
       },
     };
 
-    const tournamentID = body.tournamentName;
+    const tournamentID = body.tournamentName.trim().replace(/\s+/g, "_");
     const params = {
       TransactItems: [
         {
