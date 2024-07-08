@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { KEY_TOURNAMENT } from "../../../../shared/constants";
 import { headers } from "../../../../shared/headers/headers";
 
@@ -18,21 +18,20 @@ export const GetTournamentHostHandler = async (event: { body: any }) => {
   const sk = `${KEY_TOURNAMENT}#${body.tournamentId}`;
   const params = {
     TableName,
-    KeyConditionExpression: `pk = :pk and sk = :sk`,
-    ExpressionAttributeValues: {
-      ":pk": `${pk}`,
-      ":sk": `${sk}`,
+    Key: {
+      pk: `${pk}`,
+      sk: `${sk}`,
     },
   };
   try {
-    const command = new QueryCommand(params);
-    const results = await docClient.send(command);
-
-    const data = results.Items?.map((dynamoTournament) => {
-      return {
-        host: dynamoTournament.gsi1pk.split("#")[1],
-      };
-    });
+    const command = new GetCommand(params);
+    const result = await docClient.send(command);
+    const host = result.Item
+      ? result.Item.gsi1pk.split("#")[1]
+      : "No Host ID found";
+    const data = {
+      host,
+    };
 
     return {
       statusCode: 200,
