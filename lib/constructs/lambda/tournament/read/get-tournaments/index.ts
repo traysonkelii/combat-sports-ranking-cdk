@@ -2,7 +2,7 @@ import { ITable } from "aws-cdk-lib/aws-dynamodb";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
-import { LambdaBase } from "../../shared/lambda-base/lambda-base";
+import { LambdaBase } from "../../../shared/lambda-base/lambda-base";
 
 export interface GetTournamentLambdaProps {
   table: ITable;

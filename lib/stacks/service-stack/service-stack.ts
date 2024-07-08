@@ -8,9 +8,10 @@ import { CreateRoleLambda } from "../../constructs/lambda/role/create";
 import { CreateTournamentLambda } from "../../constructs/lambda/tournament/create";
 import { CreateGymLambda } from "../../constructs/lambda/gym/create";
 import { GetUsersByRoleLambda } from "../../constructs/lambda/role/read";
-import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read";
 import { GetGymLambda } from "../../constructs/lambda/gym/read";
 import { EnvironmentConfig, projectName } from "../../config/configuration";
+import { GetTournamentsLambda } from "../../constructs/lambda/tournament/read/get-tournaments";
+import { GetTournamentHostLambda } from "lib/constructs/lambda/tournament/read/get-tournament-host";
 
 interface ServiceStackPrompts extends EnvironmentConfig {
   readonly tableArn: string;
@@ -73,6 +74,12 @@ export class ServiceStack extends cdk.Stack {
     const getTournamentsLambda = new GetTournamentsLambda(
       this,
       `GetTournamentsLambda`,
+      { table, region }
+    ).lambda;
+
+    const getTournamentHostLambda = new GetTournamentHostLambda(
+      this,
+      `GetTournamentHostLambda`,
       { table, region }
     ).lambda;
 
@@ -155,6 +162,13 @@ export class ServiceStack extends cdk.Stack {
       "POST",
       new apigateway.LambdaIntegration(getTournamentsLambda)
     );
+
+    tournament
+      .addResource("get-host")
+      .addMethod(
+        "POST",
+        new apigateway.LambdaIntegration(getTournamentHostLambda)
+      );
 
     /**
      * Gym endpoints
