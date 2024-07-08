@@ -27,7 +27,7 @@ export const CreateTournamentHandler = async (event: { body: any }) => {
       dateStart: body.dateStart ?? "",
       dateEnd: body.dateEnd ?? "",
       location: body.location ?? "",
-      tournamentName: body.tournamentName,
+      tournamentName: body.tournamentName.trim().replace(/\s+/g, "_"),
     };
 
     console.log("body: ", data);
